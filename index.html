@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard CD 2026 - Arquivologia</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #005f73;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .dashboard {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .dashboard h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #333;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 10px;
+        }
+        .progress-section {
+            margin-bottom: 15px;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 24px;
+            width: 100%;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #edf2f7;
+            text-align: left;
+        }
+        th {
+            background-color: #0a9396;
+            color: white;
+            font-weight: 600;
+        }
+        .checkbox-cell {
+            text-align: center;
+            width: 80px;
+        }
+        .disciplina-header td {
+            background-color: #e9d8a6;
+            color: #001219;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 15px;
+        }
+        .topico-principal {
+            font-weight: 600;
+            color: #222;
+        }
+        .subtopico {
+            padding-left: 40px !important;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #0a9396;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .disciplina-header:hover {
+            background-color: #e9d8a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edital Verticalizado Completo</h1>
+        <p class="subtitle">Câmara dos Deputados 2026 - Analista Legislativo: Arquivologia</p>
+
+        <div class="dashboard">
+            <h2>📊 Dashboard de Desempenho</h2>
+            
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Progresso Global do Edital</span>
+                    <span id="geral-text">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="geral-fill" class="progress-fill" style="background-color: #005f73;"></div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>📖 Teoria</span>
+                        <span id="teoria-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="teoria-fill" class="progress-fill" style="background-color: #0a9396;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>📝 Questões</span>
+                        <span id="questoes-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="questoes-fill" class="progress-fill" style="background-color: #ee9b00;"></div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>🔄 Revisão</span>
+                        <span id="revisao-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="revisao-fill" class="progress-fill" style="background-color: #ae2012;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container" id="tabela-container">
+            <!-- Tabela injetada via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Estrutura de dados COMPLETA extraída do Edital
+        const edital = [
+            {
+                disciplina: "Conhecimentos Básicos - Língua Portuguesa",
+                topicos: [
+                    "1. Compreensão e interpretação de textos de gêneros variados.",
+                    "2. Reconhecimento de tipos e gêneros textuais.",
+                    "3. Domínio da ortografia.",
+                    "4. Domínio dos mecanismos de coesão textual.",
+                    "4.1. Emprego de elementos de referenciação, substituição e repetição, de conectores e de outros elementos de sequenciação textual.",
+                    "4.2. Emprego de tempos e modos verbais.",
+                    "5. Domínio da estrutura morfossintática do período.",
+                    "5.1. Emprego das classes de palavras.",
+                    "5.2. Relações de coordenação entre orações e entre termos da oração.",
+                    "5.3. Relações de subordinação entre orações e entre termos da oração.",
+                    "5.4. Emprego dos sinais de pontuação.",
+                    "5.5. Concordância verbal e nominal.",
+                    "5.6. Regência verbal e nominal.",
+                    "5.7. Emprego do sinal indicativo de crase.",
+                    "5.8. Colocação dos pronomes átonos.",
+                    "6. Reescrita de frases e parágrafos do texto.",
+                    "6.1. Significação das palavras.",
+                    "6.2. Substituição de palavras ou de trechos de texto.",
+                    "6.3. Reorganização da estrutura de orações e de períodos do texto.",
+                    "6.4. Reescrita de textos de diferentes gêneros e níveis de formalidade."
+                ]
+            },
+            {
+                disciplina: "Conhecimentos Básicos - Língua Inglesa",
+                topicos: [
+                    "1. Compreensão de textos variados: domínio do vocabulário e da estrutura da língua, ideias principais e secundárias, explícitas e implícitas, relações intratextuais e intertextuais.",
+                    "2. Itens gramaticais relevantes para compreensão de conteúdos semânticos.",
+                    "3. Conhecimento e uso das formas contemporâneas da linguagem inglesa."
+                ]
+            },
+            {
+                disciplina: "Conhecimentos Básicos - Noções de Dir. Administrativo e Adm. Pública",
+                topicos: [
+                    "1. Estado, governo e Administração Pública: conceito, elementos, poderes e organização do Estado.",
+                    "1.1. Princípios constitucionais e doutrinários da Administração Pública.",
+                    "1.2. Organização administrativa: administração direta e indireta; centralização, descentralização, concentração e desconcentração.",
+                    "2. Ato administrativo.",
+                    "2.1. Conceito, requisitos, atributos, classificação e espécies, extinção, nulidades e revogação.",
+                    "2.2. Parecer: responsabilidade do emissor do parecer.",
+                    "3. Agentes públicos.",
+                    "3.1. Disposições constitucionais aplicáveis.",
+                    "3.2. Cargo, emprego e função pública.",
+                    "3.3. Requisição.",
+                    "3.4. Regime jurídico dos servidores públicos federais (Lei 8.112/1990 e suas alterações).",
+                    "4. Direito administrativo disciplinar.",
+                    "4.1. Fontes e princípios.",
+                    "4.2. Ilícito de direito administrativo disciplinar.",
+                    "4.3. Procedimentos disciplinares da administração pública.",
+                    "4.4. Processo Administrativo Federal (Lei nº 9.784/1999 e suas alterações).",
+                    "5. Poderes administrativos.",
+                    "5.1. Discricionário, hierárquico, disciplinar, regulamentar e de polícia.",
+                    "5.2. Uso e abuso do poder.",
+                    "6. Responsabilidade civil do Estado.",
+                    "6.1. Responsabilidade civil do Estado no direito brasileiro.",
+                    "6.2. Responsabilidade por ato comissivo do Estado.",
+                    "6.3. Responsabilidade por omissão do Estado.",
+                    "6.4. Requisitos para a demonstração da responsabilidade do Estado.",
+                    "6.5. Causas excludentes e atenuantes da responsabilidade do Estado.",
+                    "7. Improbidade Administrativa (Lei nº 8.429/1992 e suas alterações).",
+                    "8. Evolução dos modelos de gestão pública: patrimonialismo, administração burocrática e nova gestão pública (New Public Management).",
+                    "8.1. Nova Governança Pública (New Public Governance): conceito, fundamentos e evolução.",
+                    "8.2. Ação pública em redes de cooperação, articulação interinstitucional e parcerias com o setor privado e terceiro setor.",
+                    "8.3. Coprodução do bem público, participação cidadã e transparência ativa.",
+                    "8.4. Valor Público, cadeia de valor público.",
+                    "9. Governança na Administração Pública.",
+                    "9.1. Governança pública: conceito, distinção entre governança e governabilidade e alinhamento estratégico.",
+                    "9.2. Mecanismos de governança: liderança, estratégia e controle.",
+                    "9.3. Conceito de valor público: geração de valor para a sociedade, entrega de resultados, sustentabilidade e avaliação de impactos de políticas públicas.",
+                    "9.4. Decreto Federal nº 9.203/2017 e suas alterações.",
+                    "10. Noções de Licitações e Contratos (Lei nº 14.133/2021 e suas alterações).",
+                    "10.1. Licitação Pública: conceito, princípios, finalidade do procedimento licitatório, modalidades, dispensa e inexigibilidade de licitação.",
+                    "10.2. Contratos administrativos.",
+                    "10.3. Características do contrato administrativo.",
+                    "10.4. Formalização, gestão e fiscalização do contrato.",
+                    "10.5. Planejamento e fiscalização contratual.",
+                    "10.6. Papel do fiscalizador do contrato.",
+                    "10.7. Estudo Técnico Preliminar e Termo de Referência.",
+                    "11. Lei de Acesso à Informação (Lei nº 12.527/2011 e suas alterações).",
+                    "12. Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 e suas alterações)."
+                ]
+            },
+            {
+                disciplina: "Conhecimentos Básicos - Tecnologia da Informação e Dados",
+                topicos: [
+                    "1. MSOffice 365 (Word, Excel, PowerPoint e OneDrive).",
+                    "2. Redes de computadores.",
+                    "2.1. Conceitos básicos, ferramentas, aplicativos e procedimentos de Internet e intranet.",
+                    "3. Ferramentas de comunicação e colaboração: correio eletrônico, aplicativos de comunicação (Microsoft Teams, Google Meet).",
+                    "4. Conceitos gerais de segurança e governança digital.",
+                    "4.1. Segurança da informação: procedimentos de cópia de segurança (backup), noções de vírus, worms e pragas virtuais.",
+                    "4.2. Programas de proteção (antivírus, firewall, antispyware).",
+                    "4.3. Ameaças digitais (phishing, pharming).",
+                    "5. Conceitos básicos de inteligência artificial.",
+                    "5.1. Engenharia de prompts.",
+                    "5.2. Aprendizado supervisionado, não supervisionado e por reforço.",
+                    "5.3. IA generativa: conceitos, exemplos e casos de uso.",
+                    "6. Ética e responsabilidade digital no serviço público.",
+                    "7. Dados.",
+                    "7.1. Conceitos, atributos, métricas, transformação de dados.",
+                    "8. Visualização de dados.",
+                    "8.1. Princípios de visualização de dados.",
+                    "8.2. Tipos de gráficos (histograma, linha, barra, dispersão, box plot).",
+                    "8.3. Ferramentas de visualização de dados (Power BI, Tableau e Data Studio).",
+                    "8.4. Storytelling para visualização de dados."
+                ]
+            },
+            {
+                disciplina: "Conhecimentos Específicos (Arquivologia) - Ciência da Informação: Gestão, Governança e Ética",
+                topicos: [
+                    "1. Ciência da Informação.",
+                    "1.1. Dado, informação, documento e conhecimento: conceitos, propriedades, relações.",
+                    "1.2. Ciclo de vida da informação.",
+                    "1.3. Organização, representação, recuperação, preservação e uso da informação.",
+                    "1.4. Informação registrada, informação estruturada, semiestruturada e não estruturada.",
+                    "1.5. Comportamento informacional e necessidades de informação.",
+                    "1.6. Gestão da informação.",
+                    "1.7. Memória institucional e patrimônio informacional.",
+                    "1.8. Qualidade, confiabilidade, autenticidade, integridade, disponibilidade e acessibilidade da informação.",
+                    "2. Governança da informação e governança de dados.",
+                    "2.1. Conceitos e princípios.",
+                    "2.2. Políticas, papéis e responsabilidades.",
+                    "2.3. Data ownership, data stewardship e responsabilidades sobre ativos informacionais.",
+                    "2.4. Ciclo de vida dos dados.",
+                    "2.5. Qualidade de dados.",
+                    "2.6. Proveniência, linhagem e rastreabilidade de dados.",
+                    "2.7. Catálogos de dados e inventários de ativos informacionais.",
+                    "2.8. Dados mestres e dados de referência.",
+                    "2.9. Dados abertos governamentais: princípios, qualidade, interoperabilidade, transparência e reúso.",
+                    "3. Organização do conhecimento.",
+                    "3.1. Metadados: conceitos, funções, tipologias e aplicações.",
+                    "3.2. Metadados descritivos, administrativos, técnicos, estruturais, de direitos e de preservação.",
+                    "3.3. Qualidade e governança de metadados.",
+                    "3.4. Perfis de aplicação e crosswalks entre esquemas de metadados.",
+                    "3.5. Metadados para arquivos digitais de imagem e som.",
+                    "3.6. Vocabulários controlados, listas de autoridade, tesauros e taxonomias.",
+                    "3.7. Ontologias: conceitos, classes, propriedades, relações e aplicações.",
+                    "3.8. Interoperabilidade sintática, estrutural, semântica e organizacional.",
+                    "3.9. Dados estruturados para consumo humano e por máquinas.",
+                    "4. Transparência e ética da informação.",
+                    "4.1. Transparência, acesso, restrição e sigilo.",
+                    "4.2. Ética informacional e responsabilidade profissional."
+                ]
+            },
+            {
+                disciplina: "Conhecimentos Específicos (Arquivologia) - Teoria, Gestão, Política e Legislação",
+                topicos: [
+                    "1. Teoria arquivística.",
+                    "1.1. Arquivologia clássica, moderna e contemporânea.",
+                    "1.2. Princípios arquivísticos.",
+                    "1.3. Documento arquivístico e documento arquivístico digital.",
+                    "1.4. Características dos documentos de arquivo.",
+                    "1.5. Fundo, série, subsérie, dossiê e item documental.",
+                    "1.6. Ciclo vital dos documentos e teoria das três idades.",
+                    "1.7. Records continuum.",
+                    "1.8. Valores documentais.",
+                    "1.9. Gênero, espécie e tipo documental.",
+                    "1.10. Diplomática e tipologia documental.",
+                    "1.11. Diplomática digital e autenticidade.",
+                    "2. Gestão arquivística de documentos.",
+                    "2.1. Política e programa de gestão de documentos.",
+                    "2.2. Produção, captura, registro, tramitação, uso, armazenamento e destinação.",
+                    "2.3. Diagnóstico arquivístico.",
+                    "2.4. Análise funcional e análise de processos.",
+                    "2.5. Classificação funcional.",
+                    "2.6. Plano de classificação.",
+                    "2.7. Avaliação documental.",
+                    "2.8. Valores e critérios de avaliação.",
+                    "2.9. Tabela de temporalidade e destinação.",
+                    "2.10. Eliminação, transferência e recolhimento.",
+                    "2.11. Gestão de documentos físicos, digitais e híbridos.",
+                    "2.12. Documentos essenciais e continuidade institucional.",
+                    "2.13. Plano de Classificação e Tabela de Temporalidade da Câmara dos Deputados.",
+                    "3. Documentos digitais.",
+                    "3.1. Natureza e características.",
+                    "3.2. Autenticidade, identidade, integridade, confiabilidade e usabilidade.",
+                    "3.3. Componentes digitais.",
+                    "3.4. Captura e gestão de documentos em sistemas corporativos.",
+                    "3.5. Sistema Informatizado de Gestão Arquivística de Documentos – SIGAD.",
+                    "3.6. GED, ECM, SIGAD e sistemas de negócio: diferenças e integração.",
+                    "3.7. e-ARQ Brasil, versão vigente.",
+                    "3.8. Requisitos funcionais, não funcionais e metadados.",
+                    "3.9. Trilhas de auditoria e controle do ciclo de vida.",
+                    "4. Legislação e política arquivística.",
+                    "4.1. Constituição de 1988: direito de acesso à informação, transparência e publicidade dos atos do Poder Público, gestão e preservação do patrimônio cultural.",
+                    "4.2. Lei nº 8.159/1991 e suas alterações.",
+                    "4.3. Legislação do Sistema Nacional de Arquivos – SINAR e Conselho Nacional de Arquivos – CONARQ.",
+                    "4.4. Normas internas da Câmara dos Deputados: Resolução n. 29/1993; Atos da Mesa n. 62/1985, n. 206/1990 e n. 15/1999.",
+                    "4.5. Assinaturas eletrônicas.",
+                    "4.6. Digitalização.",
+                    "4.7. Infraestrutura de Chaves Públicas Brasileira – ICP-Brasil.",
+                    "4.8. Política de acesso e tratamento de informação com restrição."
+                ]
+            }
+        ];
+
+        // Carregar dados salvos no navegador (Nova versão para não conflitar com a antiga)
+        let savedData = JSON.parse(localStorage.getItem('cd2026_progress_arq_v2')) || {};
+
+        function renderTable() {
+            let html = `<table>
+                <tr>
+                    <th>Conteúdo Programático</th>
+                    <th class="checkbox-cell">Teoria</th>
+                    <th class="checkbox-cell">Questões</th>
+                    <th class="checkbox-cell">Revisão</th>
+                </tr>`;
+            
+            edital.forEach((disc, dIndex) => {
+                html += `<tr class="disciplina-header"><td colspan="4">${disc.disciplina}</td></tr>`;
+                disc.topicos.forEach((topico, tIndex) => {
+                    const idBase = `${dIndex}-${tIndex}`;
+                    const chkTeoria = savedData[`${idBase}-t`] ? 'checked' : '';
+                    const chkQuest = savedData[`${idBase}-q`] ? 'checked' : '';
+                    const chkRev = savedData[`${idBase}-r`] ? 'checked' : '';
+                    
+                    // Verifica se o tópico começa com um formato de subtópico (ex: "4.1.")
+                    const isSubtopico = /^\d+\.\d+/.test(topico);
+                    const classTopico = isSubtopico ? 'subtopico' : 'topico-principal';
+
+                    html += `<tr>
+                        <td class="${classTopico}">${topico}</td>
+                        <td class="checkbox-cell"><input type="checkbox" onchange="updateProgress('${idBase}-t', this.checked)" ${chkTeoria}></td>
+                        <td class="checkbox-cell"><input type="checkbox" onchange="updateProgress('${idBase}-q', this.checked)" ${chkQuest}></td>
+                        <td class="checkbox-cell"><input type="checkbox" onchange="updateProgress('${idBase}-r', this.checked)" ${chkRev}></td>
+                    </tr>`;
+                });
+            });
+            html += `</table>`;
+            document.getElementById('tabela-container').innerHTML = html;
+            calculateProgress();
+        }
+
+        function updateProgress(id, isChecked) {
+            savedData[id] = isChecked;
+            localStorage.setItem('cd2026_progress_arq_v2', JSON.stringify(savedData));
+            calculateProgress();
+        }
+
+        function calculateProgress() {
+            let total = 0, theoryTotal = 0, questTotal = 0, revTotal = 0;
+            let theoryDone = 0, questDone = 0, revDone = 0;
+
+            edital.forEach((disc, dIndex) => {
+                disc.topicos.forEach((topico, tIndex) => {
+                    const idBase = `${dIndex}-${tIndex}`;
+                    total += 3;
+                    theoryTotal++; questTotal++; revTotal++;
+                    
+                    if(savedData[`${idBase}-t`]) theoryDone++;
+                    if(savedData[`${idBase}-q`]) questDone++;
+                    if(savedData[`${idBase}-r`]) revDone++;
+                });
+            });
+
+            const geralDone = theoryDone + questDone + revDone;
+            
+            const percGeral = total === 0 ? 0 : Math.round((geralDone / total) * 100);
+            document.getElementById('geral-fill').style.width = percGeral + '%';
+            document.getElementById('geral-text').innerText = percGeral + '%';
+
+            const percTeoria = theoryTotal === 0 ? 0 : Math.round((theoryDone / theoryTotal) * 100);
+            document.getElementById('teoria-fill').style.width = percTeoria + '%';
+            document.getElementById('teoria-text').innerText = percTeoria + '%';
+
+            const percQuest = questTotal === 0 ? 0 : Math.round((questDone / questTotal) * 100);
+            document.getElementById('questoes-fill').style.width = percQuest + '%';
+            document.getElementById('questoes-text').innerText = percQuest + '%';
+
+            const percRev = revTotal === 0 ? 0 : Math.round((revDone / revTotal) * 100);
+            document.getElementById('revisao-fill').style.width = percRev + '%';
+            document.getElementById('revisao-text').innerText = percRev + '%';
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>
